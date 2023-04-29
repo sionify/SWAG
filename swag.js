@@ -1,20 +1,32 @@
-const SHA256 = require('crypto-js/sha256');
+const SHA256 = CryptoJS.SHA256;
+import { Transaction } from './transaction.js';
 
 class Block {
-  constructor(timestamp, data, previousHash = '') {
-    this.timestamp = timestamp;
-    this.data = data;
+  constructor(transactions, previousHash = '') {
+    this.transactions = transactions;
     this.previousHash = previousHash;
-    this.hash = this.calculateHash();
+    this.timestamp = Date.now();
     this.nonce = 0;
+    this.hash = this.calculateHash();
   }
 
   calculateHash() {
-    return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.data) + this.nonce).toString();
+    return crypto
+      .createHash('sha256')
+      .update(
+        this.previousHash +
+        this.timestamp +
+        JSON.stringify(this.transactions) +
+        this.nonce
+      )
+      .digest('hex');
   }
 
   mineBlock(difficulty) {
-    while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
+    while (
+      this.hash.substring(0, difficulty) !==
+      Array(difficulty + 1).join('0')
+    ) {
       this.nonce++;
       this.hash = this.calculateHash();
     }

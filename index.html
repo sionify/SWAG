@@ -1,13 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>swag</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swag Coin</title>
 </head>
 <body>
-  <h1>swag Blockchain</h1>
-  <button id="mineButton">Mine Blocks</button>
+    <h1>Swag Coin</h1>
+    <div>
+        <h2>Create Transaction</h2>
+        <label for="sender">Sender:</label>
+        <input type="text" id="sender" name="sender" placeholder="Sender public key" required>
+        <br>
+        <label for="recipient">Recipient:</label>
+        <input type="text" id="recipient" name="recipient" placeholder="Recipient public key" required>
+        <br>
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" placeholder="Amount" required>
+        <br>
+        <button id="createTransaction">Create Transaction</button>
+    </div>
+    <br>
+    <div>
+        <h2>Mine Block</h2>
+        <button id="mineBlock">Mine Block</button>
+    </div>
+    <br>
+    <div>
+        <h2>Blockchain</h2>
+        <pre id="blockchain"></pre>
+    </div>
+    
 
-  <script src="dist/bundle.js"></script>
+    <script src="./crypto-js.js"></script>
+    <script type="module">
+      import { Blockchain } from './swag.js';
+      import { Transaction } from './transaction.js';
+      
+      const swagCoin = new Blockchain();
+      const createTransactionBtn = document.getElementById('createTransaction');
+      const mineBlockBtn = document.getElementById('mineBlock');
+      const blockchainDiv = document.getElementById('blockchain');
+      
+      createTransactionBtn.addEventListener('click', () => {
+        const sender = document.getElementById('sender').value;
+        const recipient = document.getElementById('recipient').value;
+        const amount = document.getElementById('amount').value;
+        
+        const transaction = new Transaction(sender, recipient, parseInt(amount));
+        // Sign the transaction here if you have the sender's private key.
+        
+        swagCoin.addTransaction(transaction);
+        console.log('Transaction created:', transaction);
+      });
+      
+      mineBlockBtn.addEventListener('click', () => {
+        swagCoin.minePendingTransactions();
+        console.log('Block mined. Updated blockchain:', swagCoin.chain);
+        displayBlockchain();
+      });
+      
+      function displayBlockchain() {
+        blockchainDiv.textContent = JSON.stringify(swagCoin.chain, null, 2);
+      }
+      
+      displayBlockchain();
+    </script>
 </body>
 </html>
